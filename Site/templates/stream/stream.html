@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block header %}
+    {% if vod is not None %}
+        <h1>{% block title %}{{ vod['title'] }}{% endblock %}</h1>
+    {% else %}
+        <h1>{% block title %}{{ stream.title }}{% endblock %}</h1>
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% if vod is not None %}
+        <div class="player">
+            <todo> add video player for recorded video</todo>
+        </div>    
+    {% else %}
+        <div class="player">
+            <todo> add video player for streams video</todo>
+        </div>
+    {% endif %}
+{% endblock %}
+        
+    

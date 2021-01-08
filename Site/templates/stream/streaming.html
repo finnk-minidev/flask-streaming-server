@@ -1,0 +1,24 @@
+<!doctype html>
+<title>{% block title %}{{ uid }}{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<div class="controls">
+    <div id="startStream" class="button">
+        Start
+    </div>
+    <h2>Preview</h2>
+    <video id="preview" width="200" height="480" autoplay muted></video>
+</div>
+<div class="right">
+    <div id="stopbutton" class="button">
+        Stop
+    </div>
+    <h2>Recording</h2>
+    <video id="recording" width="200" height="480" controls></video>
+    <a id="downloadButton" class="button">
+        Download
+    </a>
+</div>
+<div hidden="true" id="jinjaInput" streamUID="{{ uid }}"></div>
+<script src="{{url_for('static', filename='script.js')}}">
+</script>
+

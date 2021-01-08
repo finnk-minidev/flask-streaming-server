@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <h1>{% block title %}Stream Overview{% endblock %}</h1>
+    <a class="action" href="{{ url_for('stream.golive') }}">Go Live</a>
+    {% if g.user %}
+        <a class="action" href="{{ url_for('stream.manage') }}">Manage past streams</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% for live_stream in live_streams %}
+        <h3>Streams live now</h3>
+        <div class="stream_live_preview">
+            <img src="{{ live_stream.preview_src }}" alt="{{ live_stream.title }}" width="192" height="108" href="{{ url_for('stream', url=live_stream.url) }}">
+        </div>
+    {% endfor %}
+    <p>
+    <p>
+    {% for vod in vods %}
+        <h3>Past streams</h3>
+        <div class="vod_preview">
+            <img src="{{ vod['stream_preview_sorce'] }}" alt="{{ vod['title'] }}" width="192" height="108" href="{{ url_for('stream', id=vod['id']) }}">
+        </div>
+    {% endfor %}
+{% endblock %}
+    

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block header %}
+    <h1>{% block title %}Setup stream{% endblock %}</h1>
+{% endblock %}
+{% block content %}
+    <form method="post">
+        <label for="streamname">Name of the stream, leave blank if you need to go live urgently</label>
+        <input name="streamname" id="streamname">
+        <label for="password">Enter a password if you want your stream to be private, leave it blank otherwise</label>
+        <input name="password" id="password" >
+        <input type="submit" value="Createstream">
+    </form>
+{% endblock %}
