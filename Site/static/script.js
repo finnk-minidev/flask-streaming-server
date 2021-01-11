@@ -43,13 +43,28 @@ function streamToServer(){
     		}
     	},
 		audio: true
-	}).then(stream => 
+	}).then(stream => {
 		preview.srcObject = stream;
 		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
-	);
+	})
+	//stream => {
+	//};
+	new Promise(resolve => preview.onplaying = resolve).then(() => {
+		while(record){
+			startRecording(preview.captureStream(), recordingTimeMS)
+				.then(recordedChunks => {
+					sendToServer(recordedChunks);
+				}
+			)
+		}
+	})
+
+/*
 	while(record){
 		new Promise(resolve => preview.onplaying = resolve)
-		.then(() => startRecording(preview.captureStream(), recordingTimeMS))
+		.then(() => 
+			
+		startRecording(preview.captureStream(), recordingTimeMS))
 		.then(recordedChunks => {
 			sendToServer(recordedChunks);
 		}, false);
@@ -57,6 +72,7 @@ function streamToServer(){
 		
 		recording = startRecording(preview.captureStream(), recordingTimeMS);
 		setTimeout(sendToServer, 0, recording);		
+*/
 }
 
 function sendToServer(data){
@@ -64,35 +80,70 @@ function sendToServer(data){
 	request = new XMLHttpRequest();
 	fd = new FormData();
 	fd.append("video",data);
-	request.open("POST", "https://192.168.42.235:5000/show/receive/"+uid, true)
+	request.open("POST", "https://192.168.178.37:8080/show/receive/"+uid, true)
 	request.onload = function(event){};
 	request.send(blob);
 }
 
+function recordAsync(){
+	return new Promise((resolve, reject) => {
+		startRecording(preview.captureStream(), recordingTimeMS)
+		.then(recordedChunks => {
+			sendToServer(recordedChunks)
+		}).then(() => {
+			if(!record){
+				reject("recording ended") 
+			}else{
+				resolve()
+			}
+		});
+	});
+}
+
 startButton.addEventListener("click", function() {
 	record = true;
-	streamToServer();
+	
+	navigator.mediaDevices.getUserMedia({
+		video: {
+			facingMode: {
+     			exact: 'environment'
+    		}
+    	},
+		audio: true
+	}).then(stream => {
+		preview.srcObject = stream;
+		downloadButton.href = stream;
+		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
+		return new Promise(resolve => preview.onplaying = resolve);
+	}).then(function resolver(){
+		return recordAsync().then(resolver)
+	});
+	
 
-//	navigator.mediaDevices.getUserMedia({
-//		video: {
-//			facingMode: {
-//     			exact: 'environment'
-//    		}
-//    	},
-//		audio: true
-//	}).then(stream => {
-//		preview.srcObject = stream;
-//		downloadButton.href = stream;
-//		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
-//		return new Promise(resolve => preview.onplaying = resolve);
-//	}).then(() => startRecording(preview.captureStream(), recordingTimeMS))
-//	.then(recordedChunks => {
-//		sendToServer(recordedChunks);
-//		let recordedBlob = new Blob(recordedChunks, {type: "video/webm" });
-//		recording.src = URL.createObjectURL(recordedBlob);
-//		downloadButton.href = recording.src;
-//		downloadButton.download = "RecordedVideo.webm";
-//		}, false);
+	//streamToServer();
+
+	/*
+	navigator.mediaDevices.getUserMedia({
+		video: {
+			facingMode: {
+     			exact: 'environment'
+    		}
+    	},
+		audio: true
+	}).then(stream => {
+		preview.srcObject = stream;
+		downloadButton.href = stream;
+		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
+		return new Promise(resolve => preview.onplaying = resolve);
+	}).then(() => startRecording(preview.captureStream(), recordingTimeMS))
+	.then(recordedChunks => {
+		sendToServer(recordedChunks);
+		let recordedBlob = new Blob(recordedChunks, {type: "video/webm" });
+		recording.src = URL.createObjectURL(recordedBlob);
+		downloadButton.href = recording.src;
+		downloadButton.download = "RecordedVideo.webm";
+		}, false);
+		*/
 });
 
 stopButton.addEventListener("click", function() {
