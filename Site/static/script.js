@@ -17,6 +17,21 @@ function startRecording(stream, lengthInMS){
 	let recorder = new MediaRecorder(stream);
 	let data = [];
 	
+	recorder.ondataavailable = event => sendToServer(event.data);
+	recorder.start();
+	
+	let stopped = new Promise((resolve, reject) => {
+		recorder.onstop = resolve;
+		recorder.onerror = event => reject(event.name);
+	});
+
+	return Promise.all([stopped]);
+}
+/*
+function startRecording(stream, lengthInMS){
+	let recorder = new MediaRecorder(stream);
+	let data = [];
+	
 	recorder.ondataavailable = event => data.push(event.data);
 	recorder.start();
 	
@@ -30,7 +45,7 @@ function startRecording(stream, lengthInMS){
 		);
 	return Promise.all([stopped, recorded]).then(() => data);
 }
-
+*/
 function stop(stream){
 	stream.getTracks().forEach(track => track.stop());
 }
@@ -75,22 +90,38 @@ function streamToServer(){
 */
 }
 
+
 function sendToServer(data){
 	blob = new Blob(data, {type: "video/webm" });
 	request = new XMLHttpRequest();
 	fd = new FormData();
 	fd.append("video",data);
-	request.open("POST", "https://192.168.178.37:8080/show/receive/"+uid, true)
+	request.open("POST", "https://192.168.42.119:8080/show/receive/"+uid, true)
 	request.onload = function(event){};
 	request.send(blob);
 }
 
+/*
 function recordAsync(){
 	return new Promise((resolve, reject) => {
 		startRecording(preview.captureStream(), recordingTimeMS)
 		.then(recordedChunks => {
 			sendToServer(recordedChunks)
 		}).then(() => {
+			if(!record){
+				reject("recording ended") 
+			}else{
+				resolve()
+			}
+		});
+	});
+}
+*/
+
+function recordAsync(){
+	return new Promise((resolve, reject) => {
+		startRecording(preview.captureStream(), recordingTimeMS)
+		.then(() => {
 			if(!record){
 				reject("recording ended") 
 			}else{
@@ -116,7 +147,7 @@ startButton.addEventListener("click", function() {
 		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
 		return new Promise(resolve => preview.onplaying = resolve);
 	}).then(function resolver(){
-		return recordAsync().then(resolver)
+		return recordAsync();
 	});
 	
 
