@@ -14,11 +14,15 @@ function wait(delayInMS){
 }
 
 function startRecording(stream, lengthInMS){
+	console.log("recording started")
 	let recorder = new MediaRecorder(stream);
 	let data = [];
 	
-	recorder.ondataavailable = event => sendToServer(event.data);
-	recorder.start();
+	recorder.ondataavailable = event => {
+		console.log("data available");
+		sendToServer(event.data);
+	}
+	recorder.start(lengthInMS);
 	
 	let stopped = new Promise((resolve, reject) => {
 		recorder.onstop = resolve;
@@ -92,7 +96,7 @@ function streamToServer(){
 
 
 function sendToServer(data){
-console.log(" received package")
+console.log(" received package");
 	blob = new Blob(data, {type: "video/webm" });
 	request = new XMLHttpRequest();
 	fd = new FormData();
