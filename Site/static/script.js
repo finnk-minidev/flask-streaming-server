@@ -92,11 +92,12 @@ function streamToServer(){
 
 
 function sendToServer(data){
+console.log(" received package")
 	blob = new Blob(data, {type: "video/webm" });
 	request = new XMLHttpRequest();
 	fd = new FormData();
 	fd.append("video",data);
-	request.open("POST", "https://192.168.42.119:8080/show/receive/"+uid, true)
+	request.open("POST", "https://10.63.191.46:8080/show/receive/"+uid, true)
 	request.onload = function(event){};
 	request.send(blob);
 }
