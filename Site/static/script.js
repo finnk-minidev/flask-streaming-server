@@ -97,12 +97,13 @@ function streamToServer(){
 
 function sendToServer(data){
 console.log(" received package");
-	blob = new Blob(data, {type: "video/webm" });
+//	blob = new Blob(data, {type: "video/webm" });
+	blob = new Blob(data, {type: "application/octet-stream" });
 	request = new XMLHttpRequest();
-	fd = new FormData();
-	fd.append("video",data);
-	//request.open("POST", "https://192.168.42.61:8080/show/receive/"+uid, true)
-	request.open("POST", "http://192.168.42.61:7777", true)
+//	fd = new FormData();
+//	fd.append("video",data);
+//	request.open("POST", "https://192.168.42.61:8080/show/receive/"+uid, true)
+	request.open("POST", "https://192.168.42.116:7777", true)
 	request.onload = function(event){};
 	request.send(blob);
 }
