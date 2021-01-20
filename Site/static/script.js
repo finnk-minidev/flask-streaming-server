@@ -31,25 +31,7 @@ function startRecording(stream, lengthInMS){
 
 	return Promise.all([stopped]);
 }
-/*
-function startRecording(stream, lengthInMS){
-	let recorder = new MediaRecorder(stream);
-	let data = [];
-	
-	recorder.ondataavailable = event => data.push(event.data);
-	recorder.start();
-	
-	let stopped = new Promise((resolve, reject) => {
-		recorder.onstop = resolve;
-		recorder.onerror = event => reject(event.name);
-	});
-	
-	let recorded = wait(lengthInMS).then(
-		() => recorder.state == "recording" && recorder.stop()
-		);
-	return Promise.all([stopped, recorded]).then(() => data);
-}
-*/
+
 function stop(stream){
 	stream.getTracks().forEach(track => track.stop());
 }
@@ -66,8 +48,6 @@ function streamToServer(){
 		preview.srcObject = stream;
 		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
 	})
-	//stream => {
-	//};
 	new Promise(resolve => preview.onplaying = resolve).then(() => {
 		while(record){
 			startRecording(preview.captureStream(), recordingTimeMS)
@@ -77,53 +57,17 @@ function streamToServer(){
 			)
 		}
 	})
-
-/*
-	while(record){
-		new Promise(resolve => preview.onplaying = resolve)
-		.then(() => 
-			
-		startRecording(preview.captureStream(), recordingTimeMS))
-		.then(recordedChunks => {
-			sendToServer(recordedChunks);
-		}, false);
-	}
-		
-		recording = startRecording(preview.captureStream(), recordingTimeMS);
-		setTimeout(sendToServer, 0, recording);		
-*/
 }
 
 
 function sendToServer(data){
 console.log(" received package");
-//	blob = new Blob(data, {type: "video/webm" });
-	blob = new Blob(data, {type: "application/octet-stream" });
+	blob = new Blob(data, {type: "video/webm" });
 	request = new XMLHttpRequest();
-//	fd = new FormData();
-//	fd.append("video",data);
-//	request.open("POST", "https://192.168.42.61:8080/show/receive/"+uid, true)
 	request.open("POST", "https://192.168.42.116:7777", true)
 	request.onload = function(event){};
 	request.send(blob);
 }
-
-/*
-function recordAsync(){
-	return new Promise((resolve, reject) => {
-		startRecording(preview.captureStream(), recordingTimeMS)
-		.then(recordedChunks => {
-			sendToServer(recordedChunks)
-		}).then(() => {
-			if(!record){
-				reject("recording ended") 
-			}else{
-				resolve()
-			}
-		});
-	});
-}
-*/
 
 function recordAsync(){
 	return new Promise((resolve, reject) => {
@@ -156,32 +100,6 @@ startButton.addEventListener("click", function() {
 	}).then(function resolver(){
 		return recordAsync();
 	});
-	
-
-	//streamToServer();
-
-	/*
-	navigator.mediaDevices.getUserMedia({
-		video: {
-			facingMode: {
-     			exact: 'environment'
-    		}
-    	},
-		audio: true
-	}).then(stream => {
-		preview.srcObject = stream;
-		downloadButton.href = stream;
-		preview.captureStream = preview.captureStream || preview.mozCaptureStream;
-		return new Promise(resolve => preview.onplaying = resolve);
-	}).then(() => startRecording(preview.captureStream(), recordingTimeMS))
-	.then(recordedChunks => {
-		sendToServer(recordedChunks);
-		let recordedBlob = new Blob(recordedChunks, {type: "video/webm" });
-		recording.src = URL.createObjectURL(recordedBlob);
-		downloadButton.href = recording.src;
-		downloadButton.download = "RecordedVideo.webm";
-		}, false);
-		*/
 });
 
 stopButton.addEventListener("click", function() {

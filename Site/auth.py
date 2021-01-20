@@ -84,27 +84,3 @@ def login_required(view):
         return view(**kwargs)
     return wrapped_view
 
-
-'''
-@bp.route("/rand0")
-def rand0():
-    return "you rolled a 0"
-
-@bp.route("/rand1")
-def rand1():
-    return "you rolled a 1"
-
-@bp.route("/rand2")
-def rand2():
-    return "you rolled a 2"
-
-@bp.route("/surprise")
-def randomTest():
-    roll = randint(0,2)
-    if 0 == roll:
-        return redirect(url_for("auth.rand0"))
-    elif 1 == roll:
-        return redirect(url_for("auth.rand1"))
-    elif 2 == roll:
-        return redirect(url_for("auth.rand2"))
-'''            
